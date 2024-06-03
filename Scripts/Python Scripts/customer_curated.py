@@ -30,6 +30,8 @@ DropFields_node1716933233434 = DropFields.apply(frame=CustomerPrivacyFilter_node
 DropDuplicates_node1717098274670 =  DynamicFrame.fromDF(DropFields_node1716933233434.toDF().dropDuplicates(), glueContext, "DropDuplicates_node1717098274670")
 
 # Script generated for node Amazon S3
-AmazonS3_node1716933173025 = glueContext.write_dynamic_frame.from_options(frame=DropDuplicates_node1717098274670, connection_type="s3", format="json", connection_options={"path": "s3://paw-lake-house/customer/curated/", "partitionKeys": []}, transformation_ctx="AmazonS3_node1716933173025")
-
+AmazonS3_node1716933173025 = glueContext.getSink(path="s3://paw-lake-house/customer/curated/", connection_type="s3", updateBehavior="UPDATE_IN_DATABASE", partitionKeys=[], enableUpdateCatalog=True, transformation_ctx="AmazonS3_node1716933173025")
+AmazonS3_node1716933173025.setCatalogInfo(catalogDatabase="stedi",catalogTableName="customer_curated")
+AmazonS3_node1716933173025.setFormat("json")
+AmazonS3_node1716933173025.writeFrame(DropDuplicates_node1717098274670)
 job.commit()
