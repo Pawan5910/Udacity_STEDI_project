@@ -25,7 +25,7 @@ StepTrainerLanding_node1717362851198 = glueContext.create_dynamic_frame.from_cat
 CustomerCurated_node1717362853067 = glueContext.create_dynamic_frame.from_catalog(database="stedi", table_name="customer_curated", transformation_ctx="CustomerCurated_node1717362853067")
 
 # Script generated for node SQL Query
-SqlQuery326 = '''
+SqlQuery897 = '''
 SELECT 
     stl.serialnumber, 
     stl.sensorreadingtime, 
@@ -38,9 +38,11 @@ ON
     cc.serialnumber = stl.serialnumber;
 
 '''
-SQLQuery_node1717363001826 = sparkSqlQuery(glueContext, query = SqlQuery326, mapping = {"stl":StepTrainerLanding_node1717362851198, "cc":CustomerCurated_node1717362853067}, transformation_ctx = "SQLQuery_node1717363001826")
+SQLQuery_node1717363001826 = sparkSqlQuery(glueContext, query = SqlQuery897, mapping = {"stl":StepTrainerLanding_node1717362851198, "cc":CustomerCurated_node1717362853067}, transformation_ctx = "SQLQuery_node1717363001826")
 
 # Script generated for node Amazon S3
-AmazonS3_node1717363146292 = glueContext.write_dynamic_frame.from_options(frame=SQLQuery_node1717363001826, connection_type="s3", format="json", connection_options={"path": "s3://paw-lake-house/step_trainer/trusted/", "partitionKeys": []}, transformation_ctx="AmazonS3_node1717363146292")
-
+AmazonS3_node1717363146292 = glueContext.getSink(path="s3://paw-lake-house/step_trainer/trusted/", connection_type="s3", updateBehavior="UPDATE_IN_DATABASE", partitionKeys=[], enableUpdateCatalog=True, transformation_ctx="AmazonS3_node1717363146292")
+AmazonS3_node1717363146292.setCatalogInfo(catalogDatabase="stedi",catalogTableName="step_trainer_trusted")
+AmazonS3_node1717363146292.setFormat("json")
+AmazonS3_node1717363146292.writeFrame(SQLQuery_node1717363001826)
 job.commit()
