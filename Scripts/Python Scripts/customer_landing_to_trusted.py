@@ -20,6 +20,8 @@ AmazonS3_node1716668436260 = glueContext.create_dynamic_frame.from_options(forma
 PrivacyFilter_node1716668958016 = Filter.apply(frame=AmazonS3_node1716668436260, f=lambda row: (not(row["shareWithResearchAsOfDate"] == 0)), transformation_ctx="PrivacyFilter_node1716668958016")
 
 # Script generated for node Trusted Customer Zone
-TrustedCustomerZone_node1716668980693 = glueContext.write_dynamic_frame.from_options(frame=PrivacyFilter_node1716668958016, connection_type="s3", format="glueparquet", connection_options={"path": "s3://paw-lake-house/customer/trusted/", "partitionKeys": []}, format_options={"compression": "snappy"}, transformation_ctx="TrustedCustomerZone_node1716668980693")
-
+TrustedCustomerZone_node1716668980693 = glueContext.getSink(path="s3://paw-lake-house/customer/trusted/", connection_type="s3", updateBehavior="UPDATE_IN_DATABASE", partitionKeys=[], enableUpdateCatalog=True, transformation_ctx="TrustedCustomerZone_node1716668980693")
+TrustedCustomerZone_node1716668980693.setCatalogInfo(catalogDatabase="stedi",catalogTableName="customer_curated")
+TrustedCustomerZone_node1716668980693.setFormat("json")
+TrustedCustomerZone_node1716668980693.writeFrame(PrivacyFilter_node1716668958016)
 job.commit()
