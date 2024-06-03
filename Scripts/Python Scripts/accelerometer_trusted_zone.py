@@ -25,6 +25,8 @@ CustomerPrivacyFilter_node1716932894847 = Join.apply(frame1=AmazonS3_node1716932
 DropFields_node1716933233434 = DropFields.apply(frame=CustomerPrivacyFilter_node1716932894847, paths=["customername", "email", "phone", "birthdate", "serialnumber", "registrationdate", "lastupdatedate", "sharewithresearchasofdate", "sharewithpublicasofdate"], transformation_ctx="DropFields_node1716933233434")
 
 # Script generated for node Amazon S3
-AmazonS3_node1716933173025 = glueContext.write_dynamic_frame.from_options(frame=DropFields_node1716933233434, connection_type="s3", format="json", connection_options={"path": "s3://paw-lake-house/accelerometer/trusted/", "partitionKeys": []}, transformation_ctx="AmazonS3_node1716933173025")
-
+AmazonS3_node1716933173025 = glueContext.getSink(path="s3://paw-lake-house/accelerometer/trusted/", connection_type="s3", updateBehavior="UPDATE_IN_DATABASE", partitionKeys=[], enableUpdateCatalog=True, transformation_ctx="AmazonS3_node1716933173025")
+AmazonS3_node1716933173025.setCatalogInfo(catalogDatabase="stedi",catalogTableName="accelerometer_trusted")
+AmazonS3_node1716933173025.setFormat("json")
+AmazonS3_node1716933173025.writeFrame(DropFields_node1716933233434)
 job.commit()
